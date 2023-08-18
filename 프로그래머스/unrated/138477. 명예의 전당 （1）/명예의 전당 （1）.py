@@ -5,7 +5,6 @@ def solution(k, score):
         if i<=k-1:
             result.append(score[i])
             answer.append(min(result))
-            #print(answer.append((min(result))))
         else:
             if min(result)<score[i]:
                 result[result.index(min(result))] = score[i]
