@@ -1,0 +1,14 @@
+def solution(number, limit, power):
+    li =[]
+    for i in range(1,number+1):
+        count = 0
+        for j in range(1,int(i**(1/2)+1)):
+            if i % j == 0:
+                count += 1
+                if j**2 != i:
+                    count += 1
+        if limit < count:
+            li.append(power)
+        else:
+            li.append(count)
+    return sum(li)
