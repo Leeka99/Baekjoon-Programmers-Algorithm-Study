@@ -63,14 +63,14 @@ public class Main {
             }   
         }
 
-        // 동서남북 청소할 칸 없다면 뒤로 1칸 전진
+        // 동서남북 청소할 칸 없다면 뒤로 1칸 후진
         int backX = x - dx[d];
         int backY = y - dy[d];
 
-        // 전진 불가라면 종료
+        // 후진 불가라면 종료
         if (map[backX][backY] == 1) return;
 
-        // 전진 가능하다면 dfs
+        // 후진 가능하다면 dfs
         dfs(backX, backY);
     }
 }
