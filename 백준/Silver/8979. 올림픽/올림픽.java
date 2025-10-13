@@ -22,35 +22,29 @@ public class Main {
         }
 
         Arrays.sort(arr,(a,b) -> {
-            if (a[1] != b[1]) return Integer.compare(a[1], b[1]);
-            if (a[2] != b[2]) return Integer.compare(a[2], b[2]);
-            return Integer.compare(a[3], b[3]);
+            if (a[1] != b[1]) return Integer.compare(b[1], a[1]);
+            if (a[2] != b[2]) return Integer.compare(b[2], a[2]);
+            return Integer.compare(b[3], a[3]);
         });
 
-        boolean b = false;
+        int rank = 1;
+        int targetRank = 0;
         for (int i = 0; i < n; i++) {
-            if (arr[i][0] == k) {
-                for (int j = 1; j < 4; j++) {
-                    if (i == 0) {
-                        System.out.println(1);
-                        return;
-                    }
-                    for (int p = 1; p < 4; p++) {
-                        if (arr[i - 1][p] == arr[i][p]) continue;
+            if (i > 0) {
+                if (arr[i][1] == arr[i - 1][1] &&
+                    arr[i][2] == arr[i - 1][2] &&
+                    arr[i][3] == arr[i - 1][3]) {
+                } 
+                
+                else rank = i + 1;
+            }
 
-                        b = true;
-                        break;
-                    }
-                    if (b) {
-                        System.out.println(i+1);
-                        return;
-                    }
-                    if (!b) {
-                        System.out.println(i);
-                        return;
-                    }
-                }
+            if (arr[i][0] == k) {
+                targetRank = rank;
+                break;
             }
         }
+
+        System.out.println(targetRank);
     }
 }
