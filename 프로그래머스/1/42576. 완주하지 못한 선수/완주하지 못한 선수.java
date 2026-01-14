@@ -1,24 +1,23 @@
-// 완주하지 못한 1명의 선수 return
 import java.util.*;
 class Solution {
-    public static Map<String, Integer> map = new HashMap<>();
-    public static String answer;
+    private static Map<String, Integer> complete = new LinkedHashMap<>();
     public String solution(String[] participant, String[] completion) {
-        
-        for (String s : participant) {
-            map.put(s, map.getOrDefault(s, 0) + 1);
+        for (String name : participant) {
+            complete.put(name, complete.getOrDefault(name, 0) + 1);
         }
-        for (String s : completion) {
-            map.put(s, map.getOrDefault(s, 0) - 1);
-        }
-        answer = test(participant);
         
-        return answer;
+        for (String name : completion) {
+            complete.put(name, complete.getOrDefault(name, 0) - 1);
+        }
+        
+        return answer();
     }
-    public static String test(String[] participant) {
-        for (String s : participant) {
-            if (map.getOrDefault(s, 10) != 0) {
-                return s;
+    
+    private String answer() {
+        Set<Map.Entry<String, Integer>> es = complete.entrySet();
+        for (Map.Entry<String, Integer> e : es) {
+            if (e.getValue() == 1) {
+                return e.getKey();
             }
         }
         return "";
