@@ -1,102 +1,101 @@
-import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int n, l, r;
-    static int[][] map;
-    static boolean[][] visited;
-    static Queue<Point> queue;
-    static ArrayList<Point> contries; // 연합하는 나라 좌표 저장 
-    static int p; // p : 연합 인구수.
-    static int c; // c : 연합 이루고 있는 칸수
-    static int answer = 0; // 인구이동 날짜 계산
-    // 북쪽 시작. 시계방향
-    static int[] dx = {-1, 0, 1, 0};
-    static int[] dy = {0, 1, 0, -1};
-    static boolean b = true; // 연합할것이 있는지 판단
-    static class Point{
-        int x, y;
-        Point(int x, int y) {
-            this.x = x;
-            this.y = y;
+    private static int n, l, r, answer = 0;
+    private static int[][] map;
+    private static boolean[][] visited;
+    private static int[] dx = { -1, 0, 1, 0 };
+    private static int[] dy = { 0, 1, 0, -1 };
+
+    private static boolean canGo(int nx, int ny) {
+        return 0 <= nx && 0 <= ny && nx < n && ny < n;
+    }
+
+    private static boolean minus(int x1, int x2) {
+        int num = Math.abs(x1 - x2);
+        return l <= num && num <= r;
+    }
+
+    private static List<int[]> bfs(int x, int y) {
+        Queue<int[]> queue = new ArrayDeque<>();
+        List<int[]> temp = new ArrayList<>();
+        queue.offer(new int[] { x, y });
+        temp.add(new int[] { x, y });
+        visited[x][y] = true;
+        int sum = map[x][y];
+
+        while (!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            for (int dir = 0; dir < 4; dir++) {
+                int nx = curr[0] + dx[dir];
+                int ny = curr[1] + dy[dir];
+                if (!canGo(nx, ny) || visited[nx][ny])
+                    continue;
+                if (minus(map[curr[0]][curr[1]], map[nx][ny])) {
+                    visited[nx][ny] = true;
+                    queue.offer(new int[] { nx, ny });
+                    temp.add(new int[] { nx, ny });
+                    sum += map[nx][ny];
+                }
+            }
+        }
+        int avg = sum / temp.size();
+
+        for (int[] p : temp) {
+            map[p[0]][p[1]] = avg;
+        }
+
+        return temp;
+    }
+
+    private static void test() {
+        System.out.println();
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                System.out.print(map[i][j] + " ");
+            }
+            System.out.println();
         }
     }
-    public static void main(String[] args) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
-        l = Integer.parseInt(st.nextToken());
-        r = Integer.parseInt(st.nextToken());
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        n = sc.nextInt();
+        l = sc.nextInt();
+        r = sc.nextInt();
 
         map = new int[n][n];
         for (int i = 0; i < n; i++) {
-            st = new StringTokenizer(br.readLine());
             for (int j = 0; j < n; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
+                map[i][j] = sc.nextInt();
             }
         }
-
-        while (b) {
-            boolean plusDay = false;
-            b = false;
+        sc.close();
+        
+        // 인구이동
+        while (true) {
             visited = new boolean[n][n];
+            boolean moved = false;
+
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    // 방문하지 않은 칸에 대해서 연합 탐색
                     if (!visited[i][j]) {
-                        queue = new LinkedList<>();
-                        contries = new ArrayList<>();
-                        queue.add(new Point(i, j));
-                        contries.add(new Point(i, j));
-                        visited[i][j] = true;
-                        p = map[i][j];
-                        c = 1;
-                        bfs();
-                    }
-                    // 연합하기
-                    if (c > 1) {
-                        int hap  = p / c;// 인구이동 숫자 구하기
-                        for (Point contry : contries) {
-                            int x = contry.x;
-                            int y = contry.y;
-                            map[x][y] = hap;
-                            plusDay = true;
-                            b = true;
+                        List<int[]> temp = bfs(i, j);
+                        if (temp.size() > 1) {
+                            moved = true;
                         }
                     }
                 }
             }
-            if (plusDay) answer++;
-        }
 
-        // 답안 제출
-        System.out.println(answer);
-    }
-
-    // 연합 나라 찾기 함수
-    static void bfs() {
-        while (!queue.isEmpty()) {
-            Point curr = queue.poll();
-            int cx = curr.x;
-            int cy = curr.y;
-            for (int i = 0; i < 4; i++) {
-                int nx = cx + dx[i];
-                int ny = cy + dy[i];
-                if (canGo(nx, ny) && !visited[nx][ny]) {
-                    int minus = Math.abs(map[cx][cy] - map[nx][ny]);
-                    if (l <= minus && minus <= r) {
-                        queue.add(new Point(nx, ny));
-                        contries.add(new Point(nx, ny));
-                        visited[nx][ny] = true;
-                        p += map[nx][ny];
-                        c++;
-                    }
-                }
+            // 연합 없었다면 정지
+            if (!moved) {
+                break;
             }
+            answer++;
         }
-    }
-    // 범위 함수
-    static boolean canGo(int nx, int ny) {
-        return 0 <= nx && 0 <= ny && nx < n && ny < n;
+
+        // 최종 답
+        System.out.println(answer);
     }
 }
