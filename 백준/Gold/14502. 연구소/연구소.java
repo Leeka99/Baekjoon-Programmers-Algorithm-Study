@@ -3,103 +3,86 @@ import java.util.*;
 public class Main {
     private static int n, m, answer = 0;
     private static int[][] map;
-    private static int[] dx = { 0, 1, 0, -1 }; // 가로
-    private static int[] dy = { -1, 0, 1, 0 }; // 세로
+    private static int[][] copy;
+    private static int[] dx = { -1, 0, 1, 0 };
+    private static int[] dy = { 0, 1, 0, -1 };
+    private static boolean[][] visited;
 
-    private static void test() {
-        System.out.println();
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
-                System.out.print(map[i][j] + " ");
-            }
-            System.out.println();
-        }
+    private static boolean canGo(int nx, int ny) {
+        return 0 <= nx && 0 <= ny && nx < n && ny < m;
     }
 
-    private static boolean canGo(int nx, int ny, int[][] copy) {
-        if (1 > nx || 1 > ny || nx > n || ny > m)
-            return false;
-
-        if (copy[nx][ny] != 0)
-            return false;
-
-        return true;
-    }
-
-    private static int[][] spread(int[][] copy) {
+    private static void bfs(int x, int y) {
         Queue<int[]> queue = new ArrayDeque<>();
+        queue.offer(new int[] { x, y });
+        visited[x][y] = true;
 
-        // 큐에 현재 바이러스 위치 입력
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= m; j++) {
-                if (copy[i][j] == 2)
-                    queue.offer(new int[] { i, j });
-            }
-        }
-
+        // 바이러스 퍼트리기
         while (!queue.isEmpty()) {
-            int[] arr = queue.poll();
+
+            int[] curr = queue.poll();
+
             for (int dir = 0; dir < 4; dir++) {
-                int nx = arr[0] + dx[dir];
-                int ny = arr[1] + dy[dir];
-                if (canGo(nx, ny, copy)) {
+                int nx = curr[0] + dx[dir];
+                int ny = curr[1] + dy[dir];
+                // map 범위 내 && 벽 아니라면 && 방문 안 했다면 퍼트리기
+                if (canGo(nx, ny) && copy[nx][ny] != 1 && !visited[nx][ny]) {
                     copy[nx][ny] = 2;
+                    visited[nx][ny] = true;
                     queue.offer(new int[] { nx, ny });
                 }
+
             }
         }
 
-        return copy;
     }
 
-    private static void checkSafetyArea(int[][] copy) {
-        int result = 0;
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= m; j++) {
-                if (copy[i][j] == 0)
-                    result += 1;
-            }
-        }
-        answer = Math.max(answer, result);
-    }
-
-    private static int[][] copyMap() {
-        int[][] copy = new int[n + 1][m + 1];
-
-        for (int i = 1; i <= n; i++) {
-            copy[i] = map[i].clone();
-        }
-        return copy;
-    }
-
-    private static void dfs(int cnt) {
-
-        // 벽이 3개 세워졌다면
+    private static void dfs(int cnt, int sx, int sy) {
+        // 벽 3개 세워졌다면
         if (cnt == 3) {
-
-            // 배열 복사
-            int[][] copy = copyMap();
-
+            copy = new int[n][m];
+            for (int i = 0; i < n; i++) {
+                copy[i] = map[i].clone();
+            }
+            visited = new boolean[n][m];
             // 바이러스 퍼트리기
-            copy = spread(copy);
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    // 만약 바이러스 칸이라면 bfs 진행
+                    if (map[i][j] == 2 && !visited[i][j]) {
+                        bfs(i, j);
+                    }
+                }
+            }
 
-            // 안전구역 체크
-            checkSafetyArea(copy);
+            // 안전영역 최대값 확인하기
+            int sum = 0;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    if (copy[i][j] == 0)
+                        sum += 1;
+                }
+            }
+
+            answer = Math.max(answer, sum);
 
             return;
         }
 
-        // 벽세우기
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= m; j++) {
-                // 벽이거나 바이러스라면 패스
-                if (map[i][j] == 1 || map[i][j] == 2)
-                    continue;
-                map[i][j] = 1;
-                dfs(cnt + 1);
+        // 백트래킹
+        for (int i = sx; i < n; i++) {
+            for (int j = 0; j < m; j++) {
 
-                // 백트래킹
-                map[i][j] = 0;
+                // 중복 탐색 제거 -> ncr 유지
+                if (i == sx && j < sy)
+                    continue;
+
+                // 만약 빈칸이라면 벽 세우기
+                if (map[i][j] == 0) {
+                    map[i][j] = 1;
+                    dfs(cnt + 1, i, j + 1);
+                    map[i][j] = 0;
+                }
             }
         }
     }
@@ -108,16 +91,19 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         n = sc.nextInt();
         m = sc.nextInt();
-        map = new int[n + 1][m + 1];
 
-        // 연구실 초기 형태
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= m; j++) {
+        map = new int[n][m];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
                 map[i][j] = sc.nextInt();
             }
         }
         sc.close();
-        dfs(0);
+
+        // 벽 세우기
+        dfs(0, 0, 0);
+
+        // 안전영역 최대값 출력
         System.out.println(answer);
     }
 }
