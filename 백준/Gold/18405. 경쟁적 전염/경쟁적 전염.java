@@ -1,57 +1,66 @@
 import java.util.*;
 
+class Virus {
+    private int x, y, index, time;
+
+    public Virus(int x, int y, int index, int time) {
+        this.x = x;
+        this.y = y;
+        this.index = index;
+        this.time = time;
+    }
+
+    public int getX() {
+        return this.x;
+    }
+
+    public int getY() {
+        return this.y;
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
+
+    public int getTime() {
+        return this.time;
+    }
+}
+
 public class Main {
-    private static int n, k, targetX, targetY, s;
-    private static PriorityQueue<int[]> queue = new PriorityQueue<>((a, b) -> {
-        if (a[3] != b[3]) {
-            return a[3] - b[3];
-        }
-        return a[0] - b[0];
-    });
+
+    private static int n, k;
+    private static int s, x, y;
     private static int[][] map;
     private static int[] dx = { -1, 0, 1, 0 };
     private static int[] dy = { 0, 1, 0, -1 };
-
-    private static void test() {
-        System.out.println();
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
-                System.out.print(map[i][j] + " ");
-            }
-            System.out.println();
+    private static Queue<Virus> queue = new PriorityQueue<>((a, b) -> {
+        if (a.getTime() != b.getTime()) {
+            return a.getTime() - b.getTime();
         }
-        System.out.println();
-    }
+        return a.getIndex() - b.getIndex();
+    });
 
     private static boolean canGo(int nx, int ny) {
-        if (1 > nx || 1 > ny || nx > n || ny > n)
-            return false;
-
-        if (map[nx][ny] != 0)
-            return false;
-
-        return true;
+        return 0 <= nx && 0 <= ny && nx < n && ny < n;
     }
 
     private static void bfs() {
         while (!queue.isEmpty()) {
-            int[] arr = queue.poll();
-            int target = arr[0];
-            int x = arr[1];
-            int y = arr[2];
-            int time = arr[3];
+            Virus virus = queue.poll();
 
-            // s초 후 (targetX, targetY) 값 확인
-            if (time == s)
-                break;
+            // s초 지났다면 continue
+            if (s == virus.getTime())
+                continue;
 
-            // 상하좌우 바이러스 퍼트리기
+            // 전염시키기
             for (int dir = 0; dir < 4; dir++) {
-                int nx = x + dx[dir];
-                int ny = y + dy[dir];
-                if (canGo(nx, ny)) {
-                    map[nx][ny] = target;
-                    queue.offer(new int[] { target, nx, ny, time + 1 });
+                int nx = virus.getX() + dx[dir];
+                int ny = virus.getY() + dy[dir];
+
+                if (canGo(nx, ny) && map[nx][ny] == 0) {
+                    map[nx][ny] = virus.getIndex();
+                    queue.offer(new Virus(nx, ny, virus.getIndex(), virus.getTime() + 1));
                 }
             }
         }
@@ -61,27 +70,24 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         n = sc.nextInt();
         k = sc.nextInt();
+        map = new int[n][n];
 
-        // map 초기화
-        map = new int[n + 1][n + 1];
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 int num = sc.nextInt();
                 map[i][j] = num;
-                // queue에 1 ~ k까지 순서대로 저장
                 if (num != 0) {
-                    queue.offer(new int[] { num, i, j, 0 });
+                    queue.offer(new Virus(i, j, num, 0));
                 }
             }
         }
 
         s = sc.nextInt();
-        targetX = sc.nextInt();
-        targetY = sc.nextInt();
+        x = sc.nextInt();
+        y = sc.nextInt();
         sc.close();
 
         bfs();
-        System.out.println(map[targetX][targetY]);
-
+        System.out.println(map[x - 1][y - 1]);
     }
 }
