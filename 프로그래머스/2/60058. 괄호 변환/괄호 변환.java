@@ -1,62 +1,61 @@
 import java.util.*;
 class Solution {
-    private static String dfs(String s) {
-        // 1. 빈 문자열이라면 빈 문자열 반환
-        if (s.isBlank()) return s;
-        // 2. u,v로 분리
-        String u = "";
-        String v = "";
-        int left = 0, right = 0;
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == '(') left++;
-            else right++;
-            if (left != 0 && right != 0 && left == right) {
-                u = s.substring(0, i + 1);
-                if (i < s.length() - 1) v = s.substring(i + 1, s.length());
-                break;
+    
+    private String seperate(String s) {
+        
+        if (s.isEmpty()) return "";
+        
+        // u,v 문자열 분리
+        String u = "", v = "";
+        int cnt1 = 0, cnt2 = 0;
+        for (char c : s.toCharArray()) {
+            if (cnt1 != 0 && cnt2 != 0 && cnt1 == cnt2) {
+                v += c;
+                continue;
+            }
+            if(c == '(') {
+                u += c;
+                cnt1++;
+            }
+            else{
+                u += c;
+                cnt2++;
             }
         }
         
-        // 3. if u가 올바른 문자열 + v체크
-        if (check(u)) return u + dfs(v);
-        // 4. if u가 올바른 문자열 아니라면
-        else {
-            // 4-1. 빈문자열 + '('
-            // 4-2. v 1.부터 수행
-            // 4-3. ')' 붙이기
-            String tmp = "(" + dfs(v) + ")";
-            
-            // 4-4. u첫,마지막 문자 제거 + 괄호 방향 모두 뒤집기
-            u = u.substring(1, u.length() - 1);
-            u = u.replace("(", ".");
-            u = u.replace(")", "(");
-            u = u.replace(".", ")");
-            tmp += u;
-            
-            // 생성된 문자열 반환
-            return tmp;
-        }
-            
-    }
-   
-    private static boolean check(String s) {
-        Deque<Character> stack = new ArrayDeque<>();
-        
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '(') stack.push(c);
+        // u가 올바른 문자열인지 확인
+        boolean bool = check(u);
+           
+            // 만약 u가 올바른 괄호 문자열이라면
+            if (bool) {
+                return u + seperate(v);
+            }
+            // u가 올바른 괄호 문자열이 아니라면
             else {
-                if (stack.isEmpty()) return false;
-                else {
-                    stack.pop();
+                String reverse = "";
+                for (int i = 1; i < u.length() - 1; i++) {
+                    if (u.charAt(i) == '(') reverse += ')';
+                    else reverse += '(';
                 }
+                return "(" + seperate(v) + ")" + reverse;
+            }        
+    }
+    private boolean check(String u) {
+        Deque<Character> stack = new ArrayDeque<>();
+        for (char c : u.toCharArray()) {
+            if (c == '(') stack.add(c);
+            else {
+                if (stack.isEmpty()) {
+                    return false;
+                }
+                else stack.pop();
             }
         }
-        if (!stack.isEmpty()) return false;
-        else return true;
+        return stack.isEmpty();
     }
     public String solution(String p) {
-        if (check(p)) return p;
-        else return dfs(p);
+        
+        return seperate(p);
+        
     }
 }
