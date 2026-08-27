@@ -1,25 +1,27 @@
 import java.util.*;
 class Solution {
-    private static Map<String, Integer> complete = new LinkedHashMap<>();
     public String solution(String[] participant, String[] completion) {
+        String answer = "";
+        
+        HashMap<String, Integer> map = new HashMap<>();
+        
         for (String name : participant) {
-            complete.put(name, complete.getOrDefault(name, 0) + 1);
+            map.put(name, map.getOrDefault(name, 0) + 1);
         }
         
         for (String name : completion) {
-            complete.put(name, complete.getOrDefault(name, 0) - 1);
+            map.put(name, map.get(name) - 1);
         }
         
-        return answer();
-    }
-    
-    private String answer() {
-        Set<Map.Entry<String, Integer>> es = complete.entrySet();
-        for (Map.Entry<String, Integer> e : es) {
-            if (e.getValue() == 1) {
-                return e.getKey();
-            }
+        // for (Map.Entry<String, Integer> m : map.entrySet()) {
+        //     System.out.println(m.getKey());
+        //     System.out.println(m.getValue());
+        // }
+        
+        for (Map.Entry<String, Integer> m : map.entrySet()) {
+            if (m.getValue() == 1) return m.getKey();
         }
-        return "";
+        
+        return answer;
     }
 }
