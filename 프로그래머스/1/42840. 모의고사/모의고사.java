@@ -1,48 +1,38 @@
 import java.util.*;
+// 동점 => 오름차순 정렬, 누가 가장 많이 맞았나
 class Solution {
-    public static Queue<Integer> q1 = new LinkedList<>(Arrays.asList(1,2,3,4,5));
-    public static Queue<Integer> q2 = new LinkedList<>(Arrays.asList(2, 1, 2, 3, 2, 4, 2, 5));
-    public static Queue<Integer> q3 = new LinkedList<>(Arrays.asList(3, 3, 1, 1, 2, 2, 4, 4, 5, 5));
-    public static ArrayList<Integer> answer = new ArrayList<>();
-    public ArrayList<Integer> solution(int[] answers) {
-        int cnt1 = 0;
-        int cnt2 = 0;
-        int cnt3 = 0;
-        int max = 0;
-        for (int i = 0; i < answers.length; i++) {
-            
-            int num1 = q1.poll();
-            int num2 = q2.poll();
-            int num3 = q3.poll();
-            
-            if (answers[i] == num1) {
-                cnt1 += 1;
-                max = Math.max(max, cnt1);
+    public int[] solution(int[] answers) {
+        int[] answer = new int[3];
+        int[][] students = {{1, 2, 3, 4, 5},{2, 1, 2, 3, 2, 4, 2, 5},{3, 3, 1, 1, 2, 2, 4, 4, 5, 5}};
+        int[] result = new int[3];
+        
+        
+        for (int i = 0; i < 3; i++) {
+            int j = 0;
+            int tmp = 0;
+            while(j < answers.length) {
+                if (students[i][j % students[i].length] == answers[j]) {
+                    tmp += 1;
+                }
+                j++;
             }
-            if (answers[i] == num2) {
-                cnt2 += 1;
-                max = Math.max(max, cnt2);
-            }
-            if (answers[i] == num3) {
-                cnt3 += 1;
-                max = Math.max(max, cnt3);
-            }
-            
-            q1.add(num1);
-            q2.add(num2);
-            q3.add(num3);
+            result[i] = tmp;
+        }
+                
+        int maxScore = 0;
+        
+        for (int i : result) {
+            maxScore = Math.max(maxScore, i);
         }
         
-        if (max == cnt1) {
-            answer.add(1);
-        }
-        if (max == cnt2) {
-            answer.add(2);
-        }
-        if (max == cnt3) {
-            answer.add(3);
+        int idx = 0;
+        for (int i = 0; i < result.length; i++) {
+            if (maxScore == result[i]) {
+                answer[idx] = i + 1;
+                idx++;
+            }
         }
         
-        return answer;
+        return Arrays.copyOf(answer, idx);
     }
 }
