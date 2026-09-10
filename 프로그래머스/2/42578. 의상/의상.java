@@ -1,18 +1,16 @@
 import java.util.*;
-
 class Solution {
     public int solution(String[][] clothes) {
-        int answer = 0;
+        int answer = 1;
         Map<String, Integer> map = new HashMap<>();
-        for (String[] s : clothes) {
-            map.put(s[1], map.getOrDefault(s[1], 0) + 1);
+        
+        for (String[] cloth : clothes) {
+            map.put(cloth[1], map.getOrDefault(cloth[1], 0) + 1);
         }
-        Collection<Integer> vals = map.values();
-        int mul = 1;
-        for (int n : vals) {
-            mul *= (n + 1);
+        
+        for (int cnt : map.values()) {
+            answer *= (cnt + 1);
         }
-        answer = mul - 1;
-        return answer;
+        return answer - 1;
     }
 }
