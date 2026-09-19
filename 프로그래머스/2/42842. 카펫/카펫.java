@@ -1,16 +1,20 @@
+import java.util.*;
 class Solution {
     public int[] solution(int brown, int yellow) {
-        int total = brown + yellow;
+        int[] answer = new int[2];
+        int allCnt = brown + yellow;
         
-        for (int h = 1; h <= total; h++) {
-            if (total % h == 0) {
-                int w = total / h;
-                
-                if (w >= h && yellow == (h - 2)*(w - 2)) {
-                    return new int[]{w, h};
-                } 
-            }
+        for (int i = 1; i < allCnt / 2; i++) {
+            if (allCnt % i == 0) {
+                int y = i;
+                int x = allCnt / y;
+                if (x >= y && (x * y) == allCnt && (x - 2) * (y - 2) == yellow) {
+                answer[0] = x;
+                answer[1] = y;
+                break;
+                }
+            }        
         }
-        return new int[0];
+        return answer;
     }
 }
