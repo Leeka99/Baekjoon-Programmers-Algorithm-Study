@@ -9,6 +9,7 @@ class Solution {
             graphs[i] = new ArrayList<>();
             for (int j = 0; j < n; j++) {
                 if (computers[i][j] == 0) continue;
+                if (i == j) continue;
                 graphs[i].add(j);
             }
         }
