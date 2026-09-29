@@ -18,19 +18,17 @@ class Solution {
         for (int i = 0; i < n; i++) {
             if (visited[i]) continue;
             visited[i] = true;
-            visited = dfs(i, graphs, visited);
+            dfs(i, graphs, visited);
             answer++;
         }
         return answer;
     }
-    public boolean[] dfs(int index, ArrayList<Integer>[] graphs, boolean[] visited) {
+    public void dfs(int index, ArrayList<Integer>[] graphs, boolean[] visited) {
         ArrayList<Integer> graph = graphs[index];
             for (int number : graph) {
                 if (visited[number]) continue;
                 visited[number] = true;
-                visited = dfs(number, graphs, visited);
+                dfs(number, graphs, visited);
             }
-        
-        return visited;
     } 
 }
