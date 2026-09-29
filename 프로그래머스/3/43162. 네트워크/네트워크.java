@@ -1,24 +1,36 @@
+import java.util.*;
 class Solution {
-    private static boolean[] visited;
-    private static void dfs(int node, int[][] computers) {
-        visited[node] = true;
-        
-        for (int i = 0; i < computers.length; i++) {
-            if (computers[node][i] == 1 && !visited[i]) {
-                dfs(i, computers);
-            }
-        }
-    }
     public int solution(int n, int[][] computers) {
         int answer = 0;
-        visited = new boolean[computers.length];
-        for (int i = 0; i < computers.length; i++) {
-            if (!visited[i]) {
-                dfs(i, computers);
-                answer++;
+        ArrayList<Integer>[] graphs = new ArrayList[n];
+         
+        // dfs 탐색을 위한 인접 리스트 만들기
+        for (int i = 0; i < n; i++) {
+            graphs[i] = new ArrayList<>();
+            for (int j = 0; j < n; j++) {
+                if (computers[i][j] == 0) continue;
+                graphs[i].add(j);
             }
         }
         
+        // 네트워크 개수 탐색
+        boolean[] visited = new boolean[n];
+        for (int i = 0; i < n; i++) {
+            if (visited[i]) continue;
+            visited[i] = true;
+            visited = dfs(i, graphs, visited);
+            answer++;
+        }
         return answer;
     }
+    public boolean[] dfs(int index, ArrayList<Integer>[] graphs, boolean[] visited) {
+        ArrayList<Integer> graph = graphs[index];
+            for (int number : graph) {
+                if (visited[number]) continue;
+                visited[number] = true;
+                visited = dfs(number, graphs, visited);
+            }
+        
+        return visited;
+    } 
 }
